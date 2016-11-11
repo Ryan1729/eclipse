@@ -64,7 +64,59 @@ gameStateToString gameState =
 
 renderBoard : Maybe Piece -> Board -> Svg Msg
 renderBoard selected board =
-    Svg.text "board"
+    stand
+
+
+stand =
+    renderStand (boardWidth * 3 / 4) (boardHeight * 5 / 8)
+
+
+renderStand w h =
+    Svg.path
+        [ d
+            <| "M"
+            ++ toString (w * 3 / 8)
+            ++ " "
+            ++ toString (h / 3)
+            ++ (" Q "
+                    ++ toString (w * 5 / 8)
+                    ++ " "
+                    ++ toString (h / 6)
+                    ++ " "
+                    ++ toString (w * 3 / 4)
+                    ++ " "
+                    ++ toString (h / 3)
+               )
+            ++ (" T "
+                    ++ toString (w * 5 / 8)
+                    ++ " "
+                    ++ toString (h * 2 / 3)
+               )
+            ++ (" T "
+                    ++ toString (w / 4)
+                    ++ " "
+                    ++ toString (h * 2 / 3)
+               )
+            ++ (" T "
+                    ++ toString (w * 3 / 8)
+                    ++ " "
+                    ++ toString (h / 3)
+               )
+        ]
+        []
+
+
+
+-- rect
+--     [ x centerXString
+--     , y centerYString
+--     , width (toString w)
+--     , height (toString h)
+--     , rx (toString (w * 3 / 10))
+--     , ry (toString (h * 3 / 10))
+--     , transform <| "rotate(-35, " ++ centerXString ++ " " ++ centerYString ++ ")"
+--     ]
+--     []
 
 
 boardWidth =
@@ -89,3 +141,11 @@ centerX =
 
 centerY =
     boardHeight / 2
+
+
+centerXString =
+    toString centerX
+
+
+centerYString =
+    toString centerY

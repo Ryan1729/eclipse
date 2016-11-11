@@ -24,12 +24,44 @@ type GameState
 
 
 type alias Board =
-    {}
+    { zero : Pin
+    , one : Pin
+    , two : Pin
+    , three : Pin
+    , four : Pin
+    , five : Pin
+    , six : Pin
+    , seven : Pin
+    , eight : Pin
+    }
 
 
 initialBoard : Board
 initialBoard =
-    {}
+    { zero = emptyPin
+    , one = emptyPin
+    , two = emptyPin
+    , three = emptyPin
+    , four = emptyPin
+    , five = emptyPin
+    , six = emptyPin
+    , seven = emptyPin
+    , eight = emptyPin
+    }
+
+
+type Pin
+    = Pin Ball Ball Ball
+
+
+emptyPin =
+    Pin NoBall NoBall NoBall
+
+
+type Ball
+    = NoBall
+    | Red
+    | White
 
 
 type Piece
