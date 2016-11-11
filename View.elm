@@ -70,7 +70,7 @@ renderBoard selected board =
 
 
 stand =
-    renderStand -(boardWidth / 8) (boardHeight / 3) (boardWidth * 10 / 6) (boardHeight * 5 / 8)
+    renderStand -(boardWidth / 8) (boardHeight / 3) (boardWidth) (boardHeight)
 
 
 renderPins : Maybe Piece -> Board -> List (Svg Msg)
@@ -84,32 +84,32 @@ renderStand x y w h =
     Svg.path
         [ d
             <| "M"
-            ++ toString (w * 2 / 8 + x)
+            ++ toString (w * 5 / 12 + x)
             ++ " "
-            ++ toString (h / 6 + y)
+            ++ toString (h * 5 / 48 + y)
             ++ (" Q "
-                    ++ toString (w * 4 / 8 + x)
+                    ++ toString (w * 5 / 6 + x)
                     ++ " "
                     ++ toString (0 + y)
                     ++ " "
-                    ++ toString (w * 5 / 8 + x)
+                    ++ toString (w * 25 / 24 + x)
                     ++ " "
-                    ++ toString (h / 6 + y)
+                    ++ toString (h * 5 / 48 + y)
                )
             ++ (" T "
-                    ++ toString (w * 4 / 8 + x)
+                    ++ toString (w * 5 / 6 + x)
                     ++ " "
-                    ++ toString (h * 3 / 6 + y)
+                    ++ toString (h * 5 / 16 + y)
                )
             ++ (" T "
-                    ++ toString (w / 8 + x)
+                    ++ toString (w * 5 / 24 + x)
                     ++ " "
-                    ++ toString (h * 3 / 6 + y)
+                    ++ toString (h * 5 / 16 + y)
                )
             ++ (" T "
-                    ++ toString (w * 2 / 8 + x)
+                    ++ toString (w * 5 / 12 + x)
                     ++ " "
-                    ++ toString (h / 6 + y)
+                    ++ toString (h * 5 / 48 + y)
                )
         ]
         []
