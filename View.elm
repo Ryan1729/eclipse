@@ -65,42 +65,51 @@ gameStateToString gameState =
 renderBoard : Maybe Piece -> Board -> Svg Msg
 renderBoard selected board =
     stand
+        :: renderPins selected board
+        |> g []
 
 
 stand =
-    renderStand (boardWidth * 3 / 4) (boardHeight * 5 / 8)
+    renderStand (boardWidth * 1.25) (boardHeight * 1.25)
+
+
+renderPins : Maybe Piece -> Board -> List (Svg Msg)
+renderPins selected board =
+    [ rect [ fill "#888888", x centerXString, y centerYString, width "25", height "100" ] []
+    , Svg.circle [ fill "#888888", cx <| toString (centerX + 12.5), cy centerYString, r "12.5" ] []
+    ]
 
 
 renderStand w h =
     Svg.path
         [ d
             <| "M"
-            ++ toString (w * 3 / 8)
+            ++ toString (w * 2 / 8)
             ++ " "
-            ++ toString (h / 3)
+            ++ toString (h / 6)
             ++ (" Q "
+                    ++ toString (w * 4 / 8)
+                    ++ " "
+                    ++ toString (0)
+                    ++ " "
                     ++ toString (w * 5 / 8)
                     ++ " "
                     ++ toString (h / 6)
-                    ++ " "
-                    ++ toString (w * 3 / 4)
-                    ++ " "
-                    ++ toString (h / 3)
                )
             ++ (" T "
-                    ++ toString (w * 5 / 8)
+                    ++ toString (w * 4 / 8)
                     ++ " "
-                    ++ toString (h * 2 / 3)
+                    ++ toString (h * 3 / 6)
                )
             ++ (" T "
-                    ++ toString (w / 4)
+                    ++ toString (w / 8)
                     ++ " "
-                    ++ toString (h * 2 / 3)
+                    ++ toString (h * 3 / 6)
                )
             ++ (" T "
-                    ++ toString (w * 3 / 8)
+                    ++ toString (w * 2 / 8)
                     ++ " "
-                    ++ toString (h / 3)
+                    ++ toString (h / 6)
                )
         ]
         []
