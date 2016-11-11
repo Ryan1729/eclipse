@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import MaterialModel exposing (MaterialModel)
-import Model exposing (Model, Piece, Board, GameState(..))
+import Model exposing (Model, Piece, Board, GameState(..), PinId(..))
 import Html exposing (Html, text)
 import Html.App
 import Html.Attributes
@@ -82,7 +82,8 @@ renderPins selected board =
 
 renderStand x y w h =
     Svg.path
-        [ d
+        [ fill "#111111"
+        , d
             <| "M"
             ++ toString (w * 5 / 12 + x)
             ++ " "
@@ -113,6 +114,104 @@ renderStand x y w h =
                )
         ]
         []
+        :: renderLines x y w h
+        |> g []
+
+
+renderLines : Float -> Float -> Float -> Float -> List (Svg Msg)
+renderLines x y w h =
+    let
+        ( rightTopX, rightTopY ) =
+            getPinPosition Zero x y w h
+
+        ( rightMiddleX, rightMiddleY ) =
+            getPinPosition One x y w h
+
+        ( rightBottomX, rightBottomY ) =
+            getPinPosition Two x y w h
+
+        ( leftTopX, leftTopY ) =
+            getPinPosition Five x y w h
+
+        ( leftMiddleX, leftMiddleY ) =
+            getPinPosition Six x y w h
+
+        ( leftBottomX, leftBottomY ) =
+            getPinPosition Seven x y w h
+    in
+        [ Svg.path
+            [ fill "transparent"
+            , stroke "#888888"
+            , strokeWidth "4"
+            , d
+                <| "M "
+                ++ toString leftTopX
+                ++ " "
+                ++ toString leftTopY
+                ++ (" L "
+                        ++ toString rightMiddleX
+                        ++ " "
+                        ++ toString rightMiddleY
+                   )
+                ++ (" L "
+                        ++ toString leftBottomX
+                        ++ " "
+                        ++ toString leftBottomY
+                   )
+                ++ "Z"
+            ]
+            []
+        , Svg.path
+            [ fill "transparent"
+            , stroke "#888888"
+            , strokeWidth "4"
+            , d
+                <| "M "
+                ++ toString rightTopX
+                ++ " "
+                ++ toString rightTopY
+                ++ (" L "
+                        ++ toString leftMiddleX
+                        ++ " "
+                        ++ toString leftMiddleY
+                   )
+                ++ (" L "
+                        ++ toString rightBottomX
+                        ++ " "
+                        ++ toString rightBottomY
+                   )
+                ++ "Z"
+            ]
+            []
+        ]
+
+
+getPinPosition : PinId -> Float -> Float -> Float -> Float -> ( Float, Float )
+getPinPosition pinId x y w h =
+    case pinId of
+        Zero ->
+            ( w * 39 / 48 + x, h * 6 / 96 + y )
+
+        One ->
+            ( w * 22 / 24 + x, h * 13 / 96 + y )
+
+        Two ->
+            ( w * 49 / 48 + x, h * 20 / 96 + y )
+
+        Three ->
+            ( w * 7 / 12 + x, h / 6 + y )
+
+        Four ->
+            ( w * 11 / 16 + x, h * 23 / 96 + y )
+
+        Five ->
+            ( w * 6 / 24 + x, h * 19 / 96 + y )
+
+        Six ->
+            ( w * 17 / 48 + x, h * 26 / 96 + y )
+
+        Seven ->
+            ( w * 11 / 24 + x, h * 33 / 96 + y )
 
 
 

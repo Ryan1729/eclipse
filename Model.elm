@@ -32,7 +32,6 @@ type alias Board =
     , five : Pin
     , six : Pin
     , seven : Pin
-    , eight : Pin
     }
 
 
@@ -46,8 +45,18 @@ initialBoard =
     , five = emptyPin
     , six = emptyPin
     , seven = emptyPin
-    , eight = emptyPin
     }
+
+
+type PinId
+    = Zero
+    | One
+    | Two
+    | Three
+    | Four
+    | Five
+    | Six
+    | Seven
 
 
 type Pin
