@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import MaterialModel exposing (MaterialModel)
-import Model exposing (Model, Piece, Board, GameState(..), PinId(..), Pin(..), Ball(..))
+import Model exposing (Model, Ball, Board, GameState(..), PinId(..), Pin(..), Ball(..))
 import Html exposing (Html, text)
 import Html.App
 import Html.Attributes
@@ -28,7 +28,7 @@ view { mdl, model } =
             [ text "New Game" ]
         , Grid.grid []
             [ Grid.cell [ Grid.size All 5 ]
-                [ PieceView.renderRack model.selected model.rack
+                [ PieceView.renderRack model.rack
                 ]
             , Grid.cell [ Grid.size All 6 ]
                 [ Html.div [ Html.Attributes.style [ ( "width", boardWidthString ++ "px" ), ( "display", "flex" ), ( "justify-content", "center" ), ( "font-size", (boardWidth / 32 |> toString) ++ "px" ) ] ]
@@ -52,7 +52,7 @@ view { mdl, model } =
                                 []
                             ]
                         ]
-                    , renderBoard model.selected model.board
+                    , renderBoard model.board
                     ]
                 ]
             ]
@@ -73,10 +73,10 @@ gameStateToString gameState =
             ""
 
 
-renderBoard : Maybe Piece -> Board -> Svg Msg
-renderBoard selected board =
+renderBoard : Board -> Svg Msg
+renderBoard board =
     stand
-        :: renderPins selected board
+        :: renderPins board
         |> g []
 
 
@@ -100,9 +100,9 @@ stand =
     renderStand standX standY standW standH
 
 
-renderPins : Maybe Piece -> Board -> List (Svg Msg)
-renderPins selected board =
-    List.map (renderPin selected board) Model.pinIdPossibilities
+renderPins : Board -> List (Svg Msg)
+renderPins board =
+    List.map (renderPin board) Model.pinIdPossibilities
 
 
 halfPinWidth =
@@ -129,8 +129,8 @@ ballRadiusString =
     toString ballRadius
 
 
-renderPin : Maybe Piece -> Board -> PinId -> Svg Msg
-renderPin selected board pinId =
+renderPin : Board -> PinId -> Svg Msg
+renderPin board pinId =
     let
         ( baseX, baseY ) =
             getPinPosition pinId standX standY standW standH
@@ -144,14 +144,22 @@ renderPin selected board pinId =
 
         (Pin bottom middle top) =
             Model.getPin pinId board
+
+        pinExtraAttributes =
+            if bottom == NoBall || middle == NoBall || top == NoBall then
+                [ onClick (Place pinId) ]
+            else
+                []
     in
-        [ rect [ fill "#888888", x (toString topLeftCornerX), y (toString topLeftCornerY), width "25", height pinHeightString ] []
+        [ rect (pinExtraAttributes ++ [ fill "#888888", x (toString topLeftCornerX), y (toString topLeftCornerY), width "25", height pinHeightString ]) []
         , Svg.circle
-            [ fill "#888888"
-            , cx <| toString (baseX)
-            , cy (toString topLeftCornerY)
-            , r halfPinWidthString
-            ]
+            (pinExtraAttributes
+                ++ [ fill "#888888"
+                   , cx <| toString (baseX)
+                   , cy (toString topLeftCornerY)
+                   , r halfPinWidthString
+                   ]
+            )
             []
         , renderBall bottom baseX (baseY - pinHeight / 6)
         , renderBall middle baseX (baseY - pinHeight / 2)
@@ -312,19 +320,6 @@ getPinPosition pinId x y w h =
 
         Seven ->
             ( w * 11 / 24 + x, h * 33 / 96 + y )
-
-
-
--- rect
---     [ x centerXString
---     , y centerYString
---     , width (toString w)
---     , height (toString h)
---     , rx (toString (w * 3 / 10))
---     , ry (toString (h * 3 / 10))
---     , transform <| "rotate(-35, " ++ centerXString ++ " " ++ centerYString ++ ")"
---     ]
---     []
 
 
 boardWidth =

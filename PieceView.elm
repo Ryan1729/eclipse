@@ -23,8 +23,8 @@ rackHeightString =
     toString rackHeight
 
 
-renderRack : Maybe Piece -> Rack -> Svg Msg
-renderRack selected rack =
+renderRack : Rack -> Svg Msg
+renderRack rack =
     svg
         [ width rackWidthString
         , height rackHeightString
@@ -41,9 +41,9 @@ renderRack selected rack =
                 ]
                 []
            ]
-        ++ renderPieces selected rack
+        ++ renderBalls rack
 
 
-renderPieces : Maybe Piece -> Rack -> List (Svg Msg)
-renderPieces selected rack =
-    [ Svg.text "pieces" ]
+renderBalls : Rack -> List (Svg Msg)
+renderBalls rack =
+    [ Svg.text "balls" ]

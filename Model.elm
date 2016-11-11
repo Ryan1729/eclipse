@@ -3,7 +3,6 @@ module Model exposing (..)
 
 type alias Model =
     { board : Board
-    , selected : Maybe Piece
     , rack : Rack
     , gameState : GameState
     }
@@ -11,7 +10,6 @@ type alias Model =
 
 defaultModel =
     { board = initialBoard
-    , selected = Nothing
     , rack = initialRack
     , gameState = InProgress
     }
@@ -98,6 +96,45 @@ getPin pinId board =
             board.seven
 
 
+place : Ball -> PinId -> Board -> Board
+place ball pinId board =
+    case pinId of
+        Zero ->
+            { board | zero = placeOnPin ball board.zero }
+
+        One ->
+            { board | one = placeOnPin ball board.one }
+
+        Two ->
+            { board | two = placeOnPin ball board.two }
+
+        Three ->
+            { board | three = placeOnPin ball board.three }
+
+        Four ->
+            { board | four = placeOnPin ball board.four }
+
+        Five ->
+            { board | five = placeOnPin ball board.five }
+
+        Six ->
+            { board | six = placeOnPin ball board.six }
+
+        Seven ->
+            { board | seven = placeOnPin ball board.seven }
+
+
+placeOnPin newBall ((Pin bottom middle top) as pin) =
+    if bottom == NoBall then
+        Pin newBall middle top
+    else if middle == NoBall then
+        Pin bottom newBall top
+    else if top == NoBall then
+        Pin bottom middle newBall
+    else
+        pin
+
+
 type Pin
     = Pin Ball Ball Ball
 
@@ -112,10 +149,6 @@ type Ball
     | White
 
 
-type Piece
-    = Piece
-
-
 type alias Rack =
     {}
 
@@ -125,25 +158,16 @@ initialRack =
     {}
 
 
-removeFromRack : Piece -> Rack -> Rack
-removeFromRack piece rack =
+removeFromRack : Ball -> Rack -> Rack
+removeFromRack ball rack =
     rack
 
 
-type BoardId
-    = BoardId
-
-
-place : Piece -> BoardId -> Board -> Board
-place piece boardId board =
-    board
-
-
-getAvailableBoardIds : Board -> List BoardId
-getAvailableBoardIds board =
+getAvailablePinIds : Board -> List PinId
+getAvailablePinIds board =
     []
 
 
-getAvailablePieces : Rack -> List Piece
-getAvailablePieces rack =
+getAvailableBalls : Rack -> List Ball
+getAvailableBalls rack =
     []

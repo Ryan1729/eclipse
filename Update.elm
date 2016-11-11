@@ -12,40 +12,31 @@ update msg model =
         NewGame ->
             ( Model.defaultModel, Cmd.none )
 
-        Place BoardId ->
-            case model.selected of
-                Just piece ->
-                    let
-                        newModel =
-                            { model
-                                | board = Model.place piece BoardId model.board
-                                , rack = Model.removeFromRack piece model.rack
-                                , selected = Nothing
-                            }
-                    in
-                        if isCPULosingModel newModel then
-                            ( { newModel | gameState = Win }, Cmd.none )
-                        else if isUserLosingModel newModel then
-                            ( { newModel | gameState = Loss }, Cmd.none )
-                        else
-                            ( cpuTurn newModel, Cmd.none )
-
-                Nothing ->
-                    ( model, Cmd.none )
-
-        Select piece ->
-            ( { model | selected = Just piece }, Cmd.none )
+        Place pinId ->
+            let
+                newModel =
+                    { model
+                        | board = Model.place White pinId model.board
+                        , rack = Model.removeFromRack White model.rack
+                    }
+            in
+                if isCPULosingModel newModel then
+                    ( { newModel | gameState = Win }, Cmd.none )
+                else if isUserLosingModel newModel then
+                    ( { newModel | gameState = Loss }, Cmd.none )
+                else
+                    ( cpuTurn newModel, Cmd.none )
 
 
 type alias Move =
-    ( Piece, BoardId )
+    ( Ball, PinId )
 
 
 getMoves : Rack -> Board -> List Move
 getMoves rack board =
     List.map2 (,)
-        (Model.getAvailablePieces rack)
-        (Model.getAvailableBoardIds board)
+        (Model.getAvailableBalls rack)
+        (Model.getAvailablePinIds board)
         |> Extras.shuffle (Random.initialSeed 42)
 
 
@@ -111,5 +102,5 @@ cpuTurn model =
 
 
 applyMove : Model -> Move -> Model
-applyMove model ( piece, boardId ) =
-    { model | board = Model.place piece boardId model.board }
+applyMove model ( ball, pinId ) =
+    { model | board = Model.place ball pinId model.board }
