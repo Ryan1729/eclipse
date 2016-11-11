@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import MaterialModel exposing (MaterialModel)
-import Model exposing (Model, Piece, Board, GameState(..), PinId(..))
+import Model exposing (Model, Piece, Board, GameState(..), PinId(..), Pin(..), Ball(..))
 import Html exposing (Html, text)
 import Html.App
 import Html.Attributes
@@ -9,7 +9,7 @@ import MaterialMsg exposing (MaterialMsg(Mdl, U))
 import Msg exposing (Msg(..))
 import Material.Button as Button
 import Material.Grid as Grid exposing (Device(..))
-import Svg exposing (Svg, svg, rect, path, Attribute, ellipse, g)
+import Svg exposing (Svg, svg, rect, path, circle, Attribute, ellipse, g)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (onClick)
 import PieceView
@@ -41,7 +41,18 @@ view { mdl, model } =
                     , height boardHeightString
                     , viewBox ("0 0 " ++ boardWidthString ++ " " ++ boardHeightString)
                     ]
-                    [ renderBoard model.selected model.board
+                    [ Svg.defs []
+                        [ Svg.clipPath [ id "ballClip", clipPathUnits "objectBoundingBox" ]
+                            [ rect
+                                [ x "0"
+                                , y "0.125"
+                                , width "1"
+                                , height "0.75"
+                                ]
+                                []
+                            ]
+                        ]
+                    , renderBoard model.selected model.board
                     ]
                 ]
             ]
@@ -69,15 +80,104 @@ renderBoard selected board =
         |> g []
 
 
+standX =
+    -boardWidth / 8
+
+
+standY =
+    boardHeight / 3
+
+
+standW =
+    boardWidth
+
+
+standH =
+    boardHeight
+
+
 stand =
-    renderStand -(boardWidth / 8) (boardHeight / 3) (boardWidth) (boardHeight)
+    renderStand standX standY standW standH
 
 
 renderPins : Maybe Piece -> Board -> List (Svg Msg)
 renderPins selected board =
-    [ rect [ fill "#888888", x centerXString, y centerYString, width "25", height "100" ] []
-    , Svg.circle [ fill "#888888", cx <| toString (centerX + 12.5), cy centerYString, r "12.5" ] []
-    ]
+    List.map (renderPin selected board) Model.pinIdPossibilities
+
+
+halfPinWidth =
+    12.5
+
+
+halfPinWidthString =
+    toString halfPinWidth
+
+
+pinHeight =
+    100
+
+
+pinHeightString =
+    toString pinHeight
+
+
+ballRadius =
+    pinHeight / 5
+
+
+ballRadiusString =
+    toString ballRadius
+
+
+renderPin : Maybe Piece -> Board -> PinId -> Svg Msg
+renderPin selected board pinId =
+    let
+        ( baseX, baseY ) =
+            getPinPosition pinId standX standY standW standH
+
+        topLeftCornerX =
+            baseX - halfPinWidth
+
+        topLeftCornerY =
+            -- + 3 to cover the corner of the lines
+            baseY - pinHeight + 3
+
+        (Pin bottom middle top) =
+            Model.getPin pinId board
+    in
+        [ rect [ fill "#888888", x (toString topLeftCornerX), y (toString topLeftCornerY), width "25", height pinHeightString ] []
+        , Svg.circle
+            [ fill "#888888"
+            , cx <| toString (baseX)
+            , cy (toString topLeftCornerY)
+            , r halfPinWidthString
+            ]
+            []
+        , renderBall bottom baseX (baseY - pinHeight / 6)
+        , renderBall middle baseX (baseY - pinHeight / 2)
+        , renderBall top baseX (baseY - pinHeight * 5 / 6)
+        ]
+            |> g []
+
+
+nullSvg =
+    Svg.text ""
+
+
+renderBall ball x y =
+    case ball of
+        NoBall ->
+            nullSvg
+
+        Red ->
+            renderActualBall [ fill "#FF4136" ] x y
+
+        White ->
+            renderActualBall [ fill "#EEEEEE" ] x y
+
+
+renderActualBall extraAttributes xPos yPos =
+    circle ([ clipPath "url(#ballClip)", cx (toString xPos), cy (toString yPos), r ballRadiusString ] ++ extraAttributes) []
 
 
 renderStand x y w h =

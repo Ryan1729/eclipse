@@ -38,7 +38,7 @@ type alias Board =
 initialBoard : Board
 initialBoard =
     { zero = emptyPin
-    , one = emptyPin
+    , one = Pin White Red White
     , two = emptyPin
     , three = emptyPin
     , four = emptyPin
@@ -57,6 +57,45 @@ type PinId
     | Five
     | Six
     | Seven
+
+
+pinIdPossibilities =
+    [ Zero
+    , One
+    , Two
+    , Three
+    , Four
+    , Five
+    , Six
+    , Seven
+    ]
+
+
+getPin pinId board =
+    case pinId of
+        Zero ->
+            board.zero
+
+        One ->
+            board.one
+
+        Two ->
+            board.two
+
+        Three ->
+            board.three
+
+        Four ->
+            board.four
+
+        Five ->
+            board.five
+
+        Six ->
+            board.six
+
+        Seven ->
+            board.seven
 
 
 type Pin
