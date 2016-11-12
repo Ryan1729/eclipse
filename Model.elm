@@ -36,7 +36,7 @@ type alias Board =
 initialBoard : Board
 initialBoard =
     { zero = emptyPin
-    , one = Pin White Red White
+    , one = emptyPin
     , two = emptyPin
     , three = emptyPin
     , four = emptyPin
@@ -150,17 +150,29 @@ type Ball
 
 
 type alias Rack =
-    {}
+    { red : Int
+    , white : Int
+    }
 
 
 initialRack : Rack
 initialRack =
-    {}
+    { red = 12
+    , white = 12
+    }
 
 
 removeFromRack : Ball -> Rack -> Rack
 removeFromRack ball rack =
-    rack
+    case ball of
+        NoBall ->
+            rack
+
+        Red ->
+            { rack | red = max 0 <| rack.red - 1 }
+
+        White ->
+            { rack | white = max 0 <| rack.white - 1 }
 
 
 getAvailablePinIds : Board -> List PinId
@@ -170,4 +182,4 @@ getAvailablePinIds board =
 
 getAvailableBalls : Rack -> List Ball
 getAvailableBalls rack =
-    []
+    [ White ]

@@ -13,19 +13,22 @@ update msg model =
             ( Model.defaultModel, Cmd.none )
 
         Place pinId ->
-            let
-                newModel =
-                    { model
-                        | board = Model.place White pinId model.board
-                        , rack = Model.removeFromRack White model.rack
-                    }
-            in
-                if isCPULosingModel newModel then
-                    ( { newModel | gameState = Win }, Cmd.none )
-                else if isUserLosingModel newModel then
-                    ( { newModel | gameState = Loss }, Cmd.none )
-                else
-                    ( cpuTurn newModel, Cmd.none )
+            if model.rack.white > 0 then
+                let
+                    newModel =
+                        { model
+                            | board = Model.place White pinId model.board
+                            , rack = Model.removeFromRack White model.rack
+                        }
+                in
+                    if isCPULosingModel newModel then
+                        ( { newModel | gameState = Win }, Cmd.none )
+                    else if isUserLosingModel newModel then
+                        ( { newModel | gameState = Loss }, Cmd.none )
+                    else
+                        ( cpuTurn newModel, Cmd.none )
+            else
+                ( model, Cmd.none )
 
 
 type alias Move =

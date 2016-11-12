@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import MaterialModel exposing (MaterialModel)
-import Model exposing (Model, Ball, Board, GameState(..), PinId(..), Pin(..), Ball(..))
+import Model exposing (Model, Ball, Board, GameState(..), PinId(..), Pin(..), Ball(..), Rack)
 import Html exposing (Html, text)
 import Html.App
 import Html.Attributes
@@ -12,7 +12,6 @@ import Material.Grid as Grid exposing (Device(..))
 import Svg exposing (Svg, svg, rect, path, circle, Attribute, ellipse, g)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (onClick)
-import PieceView
 
 
 view : MaterialModel -> Html MaterialMsg
@@ -28,7 +27,7 @@ view { mdl, model } =
             [ text "New Game" ]
         , Grid.grid []
             [ Grid.cell [ Grid.size All 5 ]
-                [ PieceView.renderRack model.rack
+                [ renderRack model.rack
                 ]
             , Grid.cell [ Grid.size All 6 ]
                 [ Html.div [ Html.Attributes.style [ ( "width", boardWidthString ++ "px" ), ( "display", "flex" ), ( "justify-content", "center" ), ( "font-size", (boardWidth / 32 |> toString) ++ "px" ) ] ]
@@ -121,14 +120,6 @@ pinHeightString =
     toString pinHeight
 
 
-ballRadius =
-    pinHeight / 5
-
-
-ballRadiusString =
-    toString ballRadius
-
-
 renderPin : Board -> PinId -> Svg Msg
 renderPin board pinId =
     let
@@ -166,26 +157,6 @@ renderPin board pinId =
         , renderBall top baseX (baseY - pinHeight * 5 / 6)
         ]
             |> g []
-
-
-nullSvg =
-    Svg.text ""
-
-
-renderBall ball x y =
-    case ball of
-        NoBall ->
-            nullSvg
-
-        Red ->
-            renderActualBall [ fill "#FF4136" ] x y
-
-        White ->
-            renderActualBall [ fill "#EEEEEE" ] x y
-
-
-renderActualBall extraAttributes xPos yPos =
-    circle ([ clipPath "url(#ballClip)", cx (toString xPos), cy (toString yPos), r ballRadiusString ] ++ extraAttributes) []
 
 
 renderStand x y w h =
@@ -352,3 +323,84 @@ centerXString =
 
 centerYString =
     toString centerY
+
+
+rackWidth =
+    250
+
+
+rackHeight =
+    600
+
+
+rackWidthString =
+    toString rackWidth
+
+
+rackHeightString =
+    toString rackHeight
+
+
+renderRack : Rack -> Svg Msg
+renderRack rack =
+    svg
+        [ width rackWidthString
+        , height rackHeightString
+        , viewBox ("0 0 " ++ rackWidthString ++ " " ++ rackHeightString)
+        ]
+        <| [ Svg.rect
+                [ x "0"
+                , y "0"
+                , width rackWidthString
+                , height rackHeightString
+                , stroke "black"
+                , strokeWidth "2"
+                , fillOpacity "0"
+                ]
+                []
+           ]
+        ++ renderBalls rack
+
+
+renderBalls : Rack -> List (Svg Msg)
+renderBalls rack =
+    ([0..(toFloat rack.red - 1)]
+        |> List.map
+            (\index ->
+                renderBall Red (rackWidth / 3) (rackHeight * (12 - index - 0.5) / 12)
+            )
+    )
+        ++ ([0..(toFloat rack.white - 1)]
+                |> List.map
+                    (\index ->
+                        renderBall White (rackWidth * 2 / 3) (rackHeight * (12 - index - 0.5) / 12)
+                    )
+           )
+
+
+ballRadius =
+    pinHeight / 5
+
+
+ballRadiusString =
+    toString ballRadius
+
+
+nullSvg =
+    Svg.text ""
+
+
+renderBall ball x y =
+    case ball of
+        NoBall ->
+            nullSvg
+
+        Red ->
+            renderActualBall [ fill "#FF4136" ] x y
+
+        White ->
+            renderActualBall [ fill "#EEEEEE" ] x y
+
+
+renderActualBall extraAttributes xPos yPos =
+    circle ([ clipPath "url(#ballClip)", cx (toString xPos), cy (toString yPos), r ballRadiusString ] ++ extraAttributes) []
