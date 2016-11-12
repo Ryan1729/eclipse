@@ -188,8 +188,3 @@ getAvailablePinIds board =
                     |> getPin pinId
                     |> pinHasRoom
             )
-
-
-getAvailableBalls : Rack -> List Ball
-getAvailableBalls rack =
-    [ Red ]

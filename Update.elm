@@ -37,20 +37,47 @@ type alias Move =
 
 getMoves : Rack -> Board -> List Move
 getMoves rack board =
-    List.map2 (,)
-        (Model.getAvailableBalls rack)
+    List.map ((,) Red)
         (Model.getAvailablePinIds board)
         |> Extras.shuffle (Random.initialSeed 42)
+        |> Debug.log ""
 
 
 isCPULosingModel : Model -> Bool
 isCPULosingModel model =
-    False
+    let
+        rack =
+            model.rack
+    in
+        if rack.red <= 0 && rack.white <= 0 then
+            currentScore Red model.board <= currentScore White model.board
+        else
+            False
 
 
 isUserLosingModel : Model -> Bool
 isUserLosingModel model =
-    False
+    let
+        rack =
+            model.rack
+    in
+        if rack.red <= 0 && rack.white <= 0 then
+            currentScore White model.board <= currentScore Red model.board
+        else
+            False
+
+
+currentScore : Ball -> Board -> Int
+currentScore ball board =
+    case ball of
+        NoBall ->
+            0
+
+        Red ->
+            0
+
+        White ->
+            0
 
 
 nextPlayerHasNoWinningMove : Model -> Move -> Bool
