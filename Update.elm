@@ -1,4 +1,4 @@
-module Update exposing (update)
+module Update exposing (update, getMoves)
 
 import Msg exposing (Msg(..))
 import Model exposing (..)
@@ -35,9 +35,9 @@ type alias Move =
     ( Ball, PinId )
 
 
-getMoves : Rack -> Board -> List Move
-getMoves rack board =
-    List.map ((,) Red)
+getMoves : Ball -> Rack -> Board -> List Move
+getMoves ball rack board =
+    List.map ((,) ball)
         (Model.getAvailablePinIds board)
         |> Extras.shuffle (Random.initialSeed 42)
 
@@ -73,9 +73,26 @@ nextPlayerHasNoWinningMove model move =
             applyMove model move
 
         potentialFutureMoves =
-            getMoves model.rack potentialModel.board
+            getMoves White model.rack potentialModel.board
     in
         case Extras.find (userWinningMove potentialModel) potentialFutureMoves of
+            Just _ ->
+                False
+
+            Nothing ->
+                True
+
+
+nextPlayerHasNoScoreIncreasingMove : Model -> Move -> Bool
+nextPlayerHasNoScoreIncreasingMove model move =
+    let
+        potentialModel =
+            applyMove model move
+
+        potentialFutureMoves =
+            getMoves White model.rack potentialModel.board
+    in
+        case Extras.find (userScoreIncreasingMove potentialModel) potentialFutureMoves of
             Just _ ->
                 False
 
@@ -95,15 +112,38 @@ cpuWinningMove model move =
         |> isUserLosingModel
 
 
+cpuScoreIncreasingMove : Model -> Move -> Bool
+cpuScoreIncreasingMove =
+    isScoreIncreasingMove Red
+
+
+userScoreIncreasingMove : Model -> Move -> Bool
+userScoreIncreasingMove =
+    isScoreIncreasingMove White
+
+
+isScoreIncreasingMove ball model move =
+    let
+        oldScore =
+            Model.currentScore ball model.board
+
+        newScore =
+            Model.currentScore ball (applyMove model move).board
+    in
+        newScore > oldScore
+
+
 cpuTurn : Model -> Model
 cpuTurn model =
     let
         moves : List Move
         moves =
-            getMoves model.rack model.board
+            getMoves Red model.rack model.board
 
         postMovementModel =
             Extras.find (cpuWinningMove model) moves
+                |> Extras.orElseLazy (\() -> Extras.find (cpuScoreIncreasingMove model) moves)
+                |> Extras.orElseLazy (\() -> Extras.find (nextPlayerHasNoScoreIncreasingMove model) moves)
                 |> Extras.orElseLazy (\() -> Extras.find (nextPlayerHasNoWinningMove model) moves)
                 |> Extras.orElseLazy (\() -> Random.step (Random.sample moves) (Random.initialSeed 42) |> fst)
                 |> Maybe.map (applyMove model)
