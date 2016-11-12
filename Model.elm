@@ -192,12 +192,38 @@ getAvailablePinIds board =
 
 currentScore : Ball -> Board -> Int
 currentScore ball board =
-    case ball of
-        NoBall ->
-            0
+    countMultiPinPoints ball board.zero board.one board.two
+        + countMultiPinPoints ball board.zero board.three board.six
+        + countMultiPinPoints ball board.one board.four board.seven
+        + countMultiPinPoints ball board.one board.three board.five
+        + countMultiPinPoints ball board.two board.four board.six
+        + countMultiPinPoints ball board.five board.six board.seven
+        + countSinglePinPoints ball board.zero
+        + countSinglePinPoints ball board.one
+        + countSinglePinPoints ball board.two
+        + countSinglePinPoints ball board.three
+        + countSinglePinPoints ball board.four
+        + countSinglePinPoints ball board.five
+        + countSinglePinPoints ball board.six
+        + countSinglePinPoints ball board.seven
 
-        Red ->
-            0
 
-        White ->
-            0
+countSinglePinPoints ball (Pin bottom middle top) =
+    countMatches ball bottom middle top
+
+
+countMultiPinPoints : Ball -> Pin -> Pin -> Pin -> Int
+countMultiPinPoints ball (Pin bottom1 middle1 top1) (Pin bottom2 middle2 top2) (Pin bottom3 middle3 top3) =
+    countMatches ball bottom1 bottom2 bottom3
+        + countMatches ball middle1 middle2 middle3
+        + countMatches ball top1 top2 top3
+        + countMatches ball bottom1 middle2 top3
+        + countMatches ball top1 middle2 bottom3
+
+
+countMatches : Ball -> Ball -> Ball -> Ball -> Int
+countMatches selectedBallType ball1 ball2 ball3 =
+    if selectedBallType == ball1 && ball1 == ball2 && ball2 == ball3 then
+        1
+    else
+        0

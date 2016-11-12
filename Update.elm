@@ -40,7 +40,6 @@ getMoves rack board =
     List.map ((,) Red)
         (Model.getAvailablePinIds board)
         |> Extras.shuffle (Random.initialSeed 42)
-        |> Debug.log ""
 
 
 isCPULosingModel : Model -> Bool
