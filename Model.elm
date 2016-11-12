@@ -19,6 +19,7 @@ type GameState
     = InProgress
     | Win
     | Loss
+    | Tie
 
 
 type alias Board =

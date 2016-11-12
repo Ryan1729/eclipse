@@ -13,7 +13,7 @@ update msg model =
             ( Model.defaultModel, Cmd.none )
 
         Place pinId ->
-            if model.rack.white > 0 then
+            if model.gameState == InProgress then
                 let
                     newModel =
                         { model
@@ -25,6 +25,8 @@ update msg model =
                         ( { newModel | gameState = Win }, Cmd.none )
                     else if isUserLosingModel newModel then
                         ( { newModel | gameState = Loss }, Cmd.none )
+                    else if isTieModel newModel then
+                        ( { newModel | gameState = Tie }, Cmd.none )
                     else
                         ( cpuTurn newModel, Cmd.none )
             else
@@ -62,6 +64,18 @@ isUserLosingModel model =
     in
         if rack.red <= 0 && rack.white <= 0 then
             Model.currentScore White model.board <= Model.currentScore Red model.board
+        else
+            False
+
+
+isTieModel : Model -> Bool
+isTieModel model =
+    let
+        rack =
+            model.rack
+    in
+        if rack.red <= 0 && rack.white <= 0 then
+            Model.currentScore White model.board == Model.currentScore Red model.board
         else
             False
 
@@ -156,6 +170,8 @@ cpuTurn model =
             { postRackUpdateModel | gameState = Win }
         else if isUserLosingModel postRackUpdateModel then
             { postRackUpdateModel | gameState = Loss }
+        else if isTieModel postRackUpdateModel then
+            { postRackUpdateModel | gameState = Tie }
         else
             postRackUpdateModel
 

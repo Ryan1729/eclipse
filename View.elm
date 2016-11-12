@@ -61,18 +61,28 @@ view { mdl, model } =
 
 gameStateToString : Model -> String
 gameStateToString model =
-    case model.gameState of
-        Win ->
-            "You won!"
+    let
+        cpuScore =
+            toString (Model.currentScore Red model.board)
 
-        Loss ->
-            "You lost!"
+        userScore =
+            toString (Model.currentScore White model.board)
+    in
+        case model.gameState of
+            Win ->
+                "You won " ++ userScore ++ " to " ++ cpuScore
 
-        _ ->
-            "CPU: "
-                ++ toString (Model.currentScore Red model.board)
-                ++ " -  You : "
-                ++ toString (Model.currentScore White model.board)
+            Loss ->
+                "You lost " ++ userScore ++ " to " ++ cpuScore
+
+            Tie ->
+                "The game ended tied at " ++ userScore ++ " to " ++ cpuScore
+
+            _ ->
+                "CPU: "
+                    ++ cpuScore
+                    ++ " -  You : "
+                    ++ userScore
 
 
 renderBoard : Board -> Svg Msg
