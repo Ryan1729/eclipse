@@ -95,13 +95,16 @@ cpuTurn model =
                 |> Extras.orElseLazy (\() -> Random.step (Random.sample moves) (Random.initialSeed 42) |> fst)
                 |> Maybe.map (applyMove model)
                 |> Maybe.withDefault model
+
+        postRackUpdateModel =
+            { postMovementModel | rack = removeFromRack Red postMovementModel.rack }
     in
-        if isCPULosingModel postMovementModel then
-            { postMovementModel | gameState = Win }
-        else if isUserLosingModel postMovementModel then
-            { postMovementModel | gameState = Loss }
+        if isCPULosingModel postRackUpdateModel then
+            { postRackUpdateModel | gameState = Win }
+        else if isUserLosingModel postRackUpdateModel then
+            { postRackUpdateModel | gameState = Loss }
         else
-            postMovementModel
+            postRackUpdateModel
 
 
 applyMove : Model -> Move -> Model

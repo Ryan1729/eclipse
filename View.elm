@@ -133,11 +133,11 @@ renderPin board pinId =
             -- + 3 to cover the corner of the lines
             baseY - pinHeight + 3
 
-        (Pin bottom middle top) =
+        ((Pin bottom middle top) as pin) =
             Model.getPin pinId board
 
         pinExtraAttributes =
-            if bottom == NoBall || middle == NoBall || top == NoBall then
+            if Model.pinHasRoom pin then
                 [ onClick (Place pinId) ]
             else
                 []

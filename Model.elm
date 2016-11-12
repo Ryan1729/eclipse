@@ -143,6 +143,10 @@ emptyPin =
     Pin NoBall NoBall NoBall
 
 
+pinHasRoom (Pin bottom middle top) =
+    bottom == NoBall || middle == NoBall || top == NoBall
+
+
 type Ball
     = NoBall
     | Red
@@ -177,9 +181,15 @@ removeFromRack ball rack =
 
 getAvailablePinIds : Board -> List PinId
 getAvailablePinIds board =
-    []
+    pinIdPossibilities
+        |> List.filter
+            (\pinId ->
+                board
+                    |> getPin pinId
+                    |> pinHasRoom
+            )
 
 
 getAvailableBalls : Rack -> List Ball
 getAvailableBalls rack =
-    [ White ]
+    [ Red ]
