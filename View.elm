@@ -31,7 +31,7 @@ view { mdl, model } =
                 ]
             , Grid.cell [ Grid.size All 6 ]
                 [ Html.div [ Html.Attributes.style [ ( "width", boardWidthString ++ "px" ), ( "display", "flex" ), ( "justify-content", "center" ), ( "font-size", (boardWidth / 32 |> toString) ++ "px" ) ] ]
-                    [ model.gameState
+                    [ model
                         |> gameStateToString
                         |> Html.text
                     ]
@@ -59,9 +59,9 @@ view { mdl, model } =
         ]
 
 
-gameStateToString : GameState -> String
-gameStateToString gameState =
-    case gameState of
+gameStateToString : Model -> String
+gameStateToString model =
+    case model.gameState of
         Win ->
             "You won!"
 
@@ -69,7 +69,10 @@ gameStateToString gameState =
             "You lost!"
 
         _ ->
-            ""
+            "CPU: "
+                ++ toString (Model.currentScore Red model.board)
+                ++ " -  You : "
+                ++ toString (Model.currentScore White model.board)
 
 
 renderBoard : Board -> Svg Msg

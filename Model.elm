@@ -188,3 +188,16 @@ getAvailablePinIds board =
                     |> getPin pinId
                     |> pinHasRoom
             )
+
+
+currentScore : Ball -> Board -> Int
+currentScore ball board =
+    case ball of
+        NoBall ->
+            0
+
+        Red ->
+            0
+
+        White ->
+            0

@@ -62,22 +62,9 @@ isUserLosingModel model =
             model.rack
     in
         if rack.red <= 0 && rack.white <= 0 then
-            currentScore White model.board <= currentScore Red model.board
+            Model.currentScore White model.board <= Model.currentScore Red model.board
         else
             False
-
-
-currentScore : Ball -> Board -> Int
-currentScore ball board =
-    case ball of
-        NoBall ->
-            0
-
-        Red ->
-            0
-
-        White ->
-            0
 
 
 nextPlayerHasNoWinningMove : Model -> Move -> Bool
